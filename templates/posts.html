@@ -1,0 +1,21 @@
+{% extends 'base.html' %} {% block head %}
+<title>Posts</title>
+{% endblock %} {% block body %}
+<br>
+<div>
+    <h1 style="display: inline;">Explore Our Posts</h1>
+    <a style="margin-top: 15px; background-color: rgb(8, 155, 69); color: white;" href="/posts/add" class="btn float-right">Add a New Post</a>
+</div>
+
+<hr> {% for post in posts %}
+<h2>{{post.title}}</h2>
+
+{% if post.author %}
+<small><strong>Posted by: </strong>{{ post.author }} on {{post.date_posted}}</small> {% else %}
+<small><strong>Posted by: </strong>Anonym on {{post.date_posted}} </small> {%endif%}
+
+<p style="white-space: pre-wrap;"> {{post.content}}</p>
+
+<a style="background-color: rgb(8, 99, 64); color: white;" class="btn btn-sm" href="/posts/edit/{{post.id}}">Update Post</a>
+<a style="background-color: rgb(148, 30, 9); color: white;" class="btn btn-sm" href="/posts/delete/{{post.id}}">Delete</a>
+<hr> {% endfor %} {% endblock %}

@@ -1,0 +1,21 @@
+{% extends 'base.html' %} {% block head %}
+<title>New Post</title>
+{% endblock %} {% block body %}
+<br>
+<h2>Write a New Post</h2>
+<form action="/posts" method="POST">
+    <br>
+    <label for="title">Title:</label>
+    <input class="form-control" type="text" name="title" id="title" placeholder="Post title">
+    <br>
+    <label for="title">Author:</label>
+    <input class="form-control" type="text" name="author" id="author" placeholder="Your nickname">
+    <br>
+    <label for="content">Post Content:</label>
+    <textarea class="form-control" name="content" id="content" rows="3" placeholder="Please start typing here"></textarea>
+    <br>
+    <input type="submit" value="Post" class="btn" style="background-color: rgb(49, 158, 161); color: rgb(255, 255, 255);">
+</form>
+<br>
+<br>
+<br> {% endblock %}
