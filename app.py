@@ -1,10 +1,18 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, Blueprint, render_template, request, redirect, url_for, flash, session
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import UserMixin, LoginManager, login_user
+import json
+
+
+
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///posts.db'
+app.secret_key = 'here is az secret key'
 db = SQLAlchemy(app)
+db.app=app
 
 class BlogPost(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -16,9 +24,17 @@ class BlogPost(db.Model):
     def __repr__(self):
         return 'Blog post ' + str(self.id)
 
+class User(UserMixin, db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(1000), unique=True, nullable=False)
+    password = db.Column(db.String(1000), nullable=False)
+    name = db.Column(db.String(1000), nullable=False)
 
 
-@app.route('/home')
+def init_db():
+    db.create_all()
+
+@app.route('/')
 def index():
     return render_template('index.html')
 
@@ -71,9 +87,66 @@ def new_post():
         return render_template('add_post.html')
 
 
-if __name__ == '__main__' :
+@app.route('/recent')
+def recent_posts():
+    data = []
+    with open("data/news.json", "r") as json_data:
+        data=json.load(json_data)
+    return render_template("recent.html", news=data)
+
+
+@app.route('/signup')
+def signup():
+    return render_template("signup.html")
+
+
+@app.route('/signup', methods=['GET', 'POST'])
+def signup_post():
+    email = request.form.get('email')
+    name = request.form.get('name')
+    password = request.form.get('password')
+
+    user = User.query.filter_by(email=email).first()
+    if user: 
+        return redirect(url_for('signup'))
+
+    new_user = User(email=email, name=name, password=generate_password_hash(password, method='sha256'))
+
+    db.session.add(new_user)
+    db.session.commit()
+
+    if user: 
+        flash('Email address already exists')
+        return redirect(url_for('signup'))
+
+    return redirect(url_for('login'))
+
+
+@app.route('/login')
+def login():
+    return render_template("login.html")
+
+@app.route('/login', methods=['POST'])
+def login_check():
+    email = request.form.get('email')
+    password = request.form.get('password')
+    remember = True if request.form.get('remember') else False
+
+    user = User.query.filter(User.email== email).first()
+
+    if not user or not check_password_hash(user.password, password):
+        flash('Please check your login details and try again.')
+        return redirect(url_for('login')) 
+
+    login_user(user, remember=remember)
+
+    return redirect(url_for('add_post'))
+
+
+if __name__ == '__main__':
     app.run(debug=True)
 
 
 
-#$env:FLASK_ENV = "development"; flask run
+# $env:FLASK_ENV = "development"; flask run
+# py -m flask run

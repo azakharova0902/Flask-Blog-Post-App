@@ -1,0 +1,29 @@
+{% extends 'base.html'%} {% block head %}
+
+<title>Highlights</title>
+
+{% endblock %} {% block body %}
+</br>
+<h1 style="text-align: center; " class="display-4-center"> Let's explore our weekly highlights</h1>
+
+<hr>
+<section>
+    <div class="row" style="padding: 20px 15px 20px 15px; margin: 0 auto; display: iflex;">
+        {% for article in news %}
+
+        <div class="col-sm">
+            <div class="card" style="width: 350px; height: 630px;">
+                <img class="card-img-top" src="{{article.image_url}}" style="width: 328px; height: 350px;" alt="Card image cap">
+                <div class="card-body">
+                    <h5 class="card-title">{{article.title}}</h5>
+                    <p class="card-text">{{article.content}}</p>
+                    <a href="{{article.source}}" target="_blank" class="btn" style="background-color:rgb(19, 100, 83); color: white;">Read more</a>
+                </div>
+            </div>
+        </div>
+
+
+        {% endfor %}
+    </div>
+</section>
+<hr> {% endblock %}
